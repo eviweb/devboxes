@@ -1,0 +1,73 @@
+{
+    "variables": {
+        "vmname": "umini-1404",
+        "user": "vagrant",
+        "password": "vagrant",
+        "disk_size": "8000"
+    },
+
+    "builders":
+    [
+        {
+            "name": "{{ user `vmname`}}",
+            "vm_name": "{{ user `vmname`}}",
+
+            "type": "qemu",
+            "format": "qcow2",
+            "accelerator": "kvm",
+            "disk_size": "{{ user `disk_size`}}",
+            "disk_compression": true,
+
+            "iso_url": "http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-amd64/current/images/netboot/mini.iso",
+            "iso_checksum": "7297321c2fa6424417a548c85edd6e98",
+            "iso_checksum_type": "md5",
+
+            "http_directory": "http",
+
+            "ssh_username": "{{user `user`}}",
+            "ssh_password": "{{user `password`}}",
+            "ssh_wait_timeout": "60m",
+            "shutdown_command": "echo '{{user `password`}}'|sudo -S shutdown -P now",
+
+            "boot_wait": "2s",
+            "boot_command": [
+                "<esc><wait>",
+                "/linux url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+                "debian-installer=fr_FR auto locale=fr_FR kbd-chooser/method=fr ",
+                "hostname={{ .Name }} ",
+
+                "console-setup/ask_detect=false ",
+                "keyboard-configuration/layoutcode=fr ",
+
+                "passwd/user-fullname={{user `user`}} ",
+                "passwd/user-password-again={{user `password`}} ",
+                "passwd/user-password={{user `password`}} ",
+                "passwd/username={{user `user`}} ",
+
+                "initrd=/initrd.gz -- <enter>"
+            ]
+        }
+    ],
+
+    "provisioners": [
+        {
+            "type": "shell",
+            "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+            "scripts": [
+                "scripts/update.sh",
+                "scripts/packages.sh",
+                "scripts/network.sh",
+                "scripts/vagrant.sh"
+            ]
+        }
+    ],
+
+    "post-processors": [
+        {
+            "keep_input_artifact": false,
+            "output": "box/ubuntu-1404-amd64-mini-libvirt-fr.box",
+            "type": "vagrant",
+            "compression_level": 9
+        }
+    ]
+}
