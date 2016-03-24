@@ -3,7 +3,8 @@
         "vmname": "umini-1404",
         "user": "vagrant",
         "password": "vagrant",
-        "disk_size": "8000"
+        "disk_size": "8000",
+        "atlas_token": "{{env `ATLAS_TOKEN`}}"
     },
 
     "builders":
@@ -72,7 +73,7 @@
             },
             {
                 "type": "atlas",
-                "token": "{{env `ATLAS_TOKEN`}}",
+                "token": "{{user `atlas_token`}}",
                 "artifact": "eviweb/umini-1404",
                 "artifact_type": "vagrant.box",
                 "metadata": {
