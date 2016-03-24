@@ -1,1 +1,4 @@
 box/
+packer_cache
+iso
+output-*
